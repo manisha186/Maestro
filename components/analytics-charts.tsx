@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import {
   BarChart,
   Bar,
@@ -15,45 +16,43 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { monthlyTrendData, categoryBreakdown, discrepancyTypes, dailyTrendData } from "@/lib/analytics-data"
 
 const COLORS = ["#2a7de1", "#ffc857", "#1a1a1a", "#e6eaee"]
 
 export function AnalyticsCharts() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
+      
       {/* Monthly Trend Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Monthly Trend</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
-              <YAxis stroke="var(--color-muted-foreground)" />
-              <Tooltip
-                contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="processed"
-                stroke="var(--color-primary)"
-                strokeWidth={2}
-                name="Processed"
-              />
-              <Line
-                type="monotone"
-                dataKey="reconciled"
-                stroke="var(--color-accent)"
-                strokeWidth={2}
-                name="Reconciled"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
+                <YAxis stroke="var(--color-muted-foreground)" />
+                <Tooltip contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }} />
+                <Legend />
+                <Line type="monotone" dataKey="processed" stroke="var(--color-primary)" strokeWidth={2} name="Processed" />
+                <Line type="monotone" dataKey="reconciled" stroke="var(--color-accent)" strokeWidth={2} name="Reconciled" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
@@ -63,25 +62,26 @@ export function AnalyticsCharts() {
           <CardTitle className="text-lg">Invoice Categories</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={categoryBreakdown}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, value }) => `${name}: ${value}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {categoryBreakdown.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}%`}
+                  outerRadius={80}
+                  dataKey="value"
+                >
+                  {categoryBreakdown.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
@@ -91,17 +91,23 @@ export function AnalyticsCharts() {
           <CardTitle className="text-lg">Discrepancy Types</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={discrepancyTypes}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="name" stroke="var(--color-muted-foreground)" angle={-45} textAnchor="end" height={80} />
-              <YAxis stroke="var(--color-muted-foreground)" />
-              <Tooltip
-                contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }}
-              />
-              <Bar dataKey="value" fill="var(--color-primary)" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={discrepancyTypes}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--color-muted-foreground)"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis stroke="var(--color-muted-foreground)" />
+                <Tooltip contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }} />
+                <Bar dataKey="value" fill="var(--color-primary)" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
@@ -111,20 +117,23 @@ export function AnalyticsCharts() {
           <CardTitle className="text-lg">Daily Reconciliation Amount</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dailyTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis dataKey="date" stroke="var(--color-muted-foreground)" />
-              <YAxis stroke="var(--color-muted-foreground)" />
-              <Tooltip
-                contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }}
-                formatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
-              />
-              <Bar dataKey="amount" fill="var(--color-accent)" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dailyTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="date" stroke="var(--color-muted-foreground)" />
+                <YAxis stroke="var(--color-muted-foreground)" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }}
+                  formatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
+                />
+                <Bar dataKey="amount" fill="var(--color-accent)" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
+
     </div>
   )
 }
